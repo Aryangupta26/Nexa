@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { generateAIInsights } from "./dashboard";
 
@@ -55,7 +55,7 @@ export async function updateUser(data) {
         return { updatedUser, industryInsight };
       },
       {
-        timeout: 10000, // default: 5000
+        timeout: 15000, // default: 5000
       }
     );
 
@@ -71,21 +71,31 @@ export async function getUserOnboardingStatus() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
   try {
-    const user = await db.user.findUnique({
-      where: {
-        clerkUserId: userId,
-      },
+    // Try to find existing user
+    let user = await db.user.findUnique({
+      where: { clerkUserId: userId },
       select: {
         industry: true,
       },
     });
+
+    // If user doesn't exist, create them with Clerk data
+    if (!user) {
+      const clerkUser = await currentUser();
+
+      user = await db.user.create({
+        data: {
+          clerkUserId: userId,
+          email: clerkUser?.emailAddresses[0]?.emailAddress || `${userId}@temp.com`,
+          name: clerkUser?.fullName || clerkUser?.firstName || null,
+          imageUrl: clerkUser?.imageUrl || null,
+        },
+        select: {
+          industry: true,
+        },
+      });
+    }
 
     return {
       isOnboarded: !!user?.industry,

@@ -55,7 +55,7 @@ export default function QuizList({ assessments }) {
                   </CardTitle>
                   <CardDescription className="flex justify-between w-full">
                     <div>Score: {assessment.quizScore.toFixed(1)}%</div>
-                    <div>
+                    <div suppressHydrationWarning>
                       {format(
                         new Date(assessment.createdAt),
                         "MMMM dd, yyyy HH:mm"

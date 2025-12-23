@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -29,6 +29,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 const DashboardView = ({ insights }) => {
+  // State for client-side date formatting to avoid hydration errors
+  const [formattedDates, setFormattedDates] = useState({
+    lastUpdated: "",
+    nextUpdate: "",
+  });
+
   // Transform salary data for the chart
   const salaryData = insights.salaryRanges.map((range) => ({
     name: range.role,
@@ -66,17 +72,19 @@ const DashboardView = ({ insights }) => {
   const OutlookIcon = getMarketOutlookInfo(insights.marketOutlook).icon;
   const outlookColor = getMarketOutlookInfo(insights.marketOutlook).color;
 
-  // Format dates using date-fns
-  const lastUpdatedDate = format(new Date(insights.lastUpdated), "dd/MM/yyyy");
-  const nextUpdateDistance = formatDistanceToNow(
-    new Date(insights.nextUpdate),
-    { addSuffix: true }
-  );
-
+  // Format dates on client-side only to avoid hydration mismatch
+  useEffect(() => {
+    setFormattedDates({
+      lastUpdated: format(new Date(insights.lastUpdated), "dd/MM/yyyy"),
+      nextUpdate: formatDistanceToNow(new Date(insights.nextUpdate), {
+        addSuffix: true,
+      }),
+    });
+  }, [insights.lastUpdated, insights.nextUpdate]);
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <Badge variant="outline">Last updated: {lastUpdatedDate}</Badge>
+        <Badge variant="outline">Last updated: {formattedDates.lastUpdated}</Badge>
       </div>
 
       {/* Market Overview Cards */}
@@ -91,7 +99,7 @@ const DashboardView = ({ insights }) => {
           <CardContent>
             <div className="text-2xl font-bold">{insights.marketOutlook}</div>
             <p className="text-xs text-muted-foreground">
-              Next update {nextUpdateDistance}
+              Next update {formattedDates.nextUpdate}
             </p>
           </CardContent>
         </Card>

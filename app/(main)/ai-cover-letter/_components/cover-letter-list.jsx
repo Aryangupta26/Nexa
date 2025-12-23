@@ -61,7 +61,8 @@ export default function CoverLetterList({ coverLetters }) {
                 <CardTitle className="text-xl gradient-title">
                   {letter.jobTitle} at {letter.companyName}
                 </CardTitle>
-                <CardDescription>
+              
+                <CardDescription suppressHydrationWarning> 
                   Created {format(new Date(letter.createdAt), "PPP")}
                 </CardDescription>
               </div>

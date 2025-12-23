@@ -88,7 +88,7 @@ export default function ResumeBuilder({ initialContent }) {
     if (contactInfo.mobile) parts.push(`📱 ${contactInfo.mobile}`);
     if (contactInfo.linkedin)
       parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
-    if (contactInfo.twitter) parts.push(`🐦 [Twitter](${contactInfo.twitter})`);
+    if (contactInfo.Github) parts.push(`🐦 [Github](${contactInfo.Github})`);
 
     return parts.length > 0
       ? `## <div align="center">${user.fullName}</div>
@@ -240,16 +240,16 @@ export default function ResumeBuilder({ initialContent }) {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Twitter/X Profile
+                    Github/X Profile
                   </label>
                   <Input
-                    {...register("contactInfo.twitter")}
+                    {...register("contactInfo.Github")}
                     type="url"
-                    placeholder="https://twitter.com/your-handle"
+                    placeholder="https://Github.com/your-handle"
                   />
-                  {errors.contactInfo?.twitter && (
+                  {errors.contactInfo?.Github && (
                     <p className="text-sm text-red-500">
-                      {errors.contactInfo.twitter.message}
+                      {errors.contactInfo.Github.message}
                     </p>
                   )}
                 </div>
